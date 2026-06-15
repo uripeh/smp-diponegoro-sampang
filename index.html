@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sistem Informasi SMP Diponegoro Sampang</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.9)), url('https://i.ibb.co.com/qYrvsybK/hall.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* Efek transisi khusus slider tab */
+        .slider-bg {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Desain Glassmorphic dengan Border Putih Tegas */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        /* Transisi Form Halus saat Switch Tab */
+        .form-fade {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Mencegah scroll default pada desktop tapi mengizinkan scroll halus pada hp kecil */
+        @media (min-width: 768px) {
+            .no-scroll-desktop {
+                overflow: hidden;
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between no-scroll-desktop select-none">
+
+    <!-- HEADER / NAVBAR -->
+    <header id="app-header" class="bg-green-800/90 backdrop-blur-md text-white shadow-lg py-3 px-6 border-b border-white/10 shrink-0 z-30">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 flex items-center justify-center">
+                    <!-- Logo Resmi Sekolah Transparan -->
+                    <img src="https://i.ibb.co.com/G4D06kBh/logodipo-trans.png" alt="Logo SMP Diponegoro" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/48x48/15803d/ffffff?text=DIPO'">
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base md:text-lg leading-tight tracking-wide text-white">SMP DIPONEGORO SAMPANG</h1>
+                    <p class="text-[10px] md:text-xs text-green-200">Maju Bersama, Berakhlak Mulia</p>
+                </div>
+            </div>
+            <!-- Status Koneksi Google Sheets -->
+            <div id="school-info" class="text-sm text-right flex items-center gap-3">
+                <div id="sync-status" class="flex items-center gap-1.5 bg-green-950/60 border border-green-700/50 px-3 py-1 rounded-full text-[11px] font-semibold">
+                    <span class="w-2 h-2 bg-amber-400 rounded-full animate-ping" id="status-dot"></span>
+                    <span id="status-text" class="text-green-100">Menghubungkan Spreadsheet...</span>
+                </div>
+                <!-- Tombol Konfigurasi API (Tampak di Builder / Urip Ambaripto) -->
+                <button id="btn-config" onclick="openConfigModal()" class="hidden bg-green-950/80 hover:bg-green-900 border border-green-700/35 p-1.5 rounded-full transition-colors text-white" title="Konfigurasi API">
+                    <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER (Tinggi Dinamis & Scrollable jika Layar Pendek agar card tampak utuh) -->
+    <main id="app-main" class="flex-grow flex items-center justify-center p-4 overflow-y-auto min-h-0">
+        
+        <!-- LOGIN CARD (Dinamis, Glassmorphism, Garis Tepi Putih Terang) -->
+        <div id="login-card" class="glass-card rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transition-all duration-500 my-auto z-10 flex flex-col">
+            <!-- Banner Indah Kartu Login -->
+            <div class="bg-gradient-to-r from-green-800/40 to-emerald-700/40 p-5 text-white text-center relative overflow-hidden border-b border-white/10 shrink-0">
+                <div class="absolute -right-10 -top-10 w-28 h-28 bg-white/5 rounded-full blur-xl"></div>
+                <div class="absolute -left-10 -bottom-10 w-28 h-28 bg-white/5 rounded-full blur-xl"></div>
+                <h2 class="text-lg font-bold tracking-wide">Portal Akademik Resmi</h2>
+                <p class="text-[11px] text-emerald-100 mt-0.5">Silakan masuk menggunakan kredensial database Anda</p>
+            </div>
+
+            <!-- Bagian Form Login Utama -->
+            <div class="p-6 relative flex-grow overflow-y-auto max-h-[70vh] md:max-h-none">
+                
+                <!-- LOADING OVERLAY -->
+                <div id="loading-overlay" class="absolute inset-0 bg-slate-950/95 z-20 flex flex-col items-center justify-center p-6 text-center rounded-b-2xl transition-all duration-300">
+                    <div class="w-10 h-10 border-4 border-green-900 border-t-green-400 rounded-full animate-spin mb-3"></div>
+                    <p class="font-bold text-slate-200 text-sm">Menyinkronkan Database</p>
+                    <p class="text-[10px] text-slate-400 mt-0.5">Memuat data real-time dari Google Sheets...</p>
+                </div>
+
+                <!-- SLIDER TAB SWITCH (Siswa vs GTK/Staff) -->
+                <div class="bg-black/30 p-1 rounded-xl flex relative mb-5 border border-white/5 shrink-0">
+                    <div id="slider-indicator" class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-white/15 rounded-lg shadow-sm slider-bg"></div>
+                    
+                    <button type="button" id="btn-tab-siswa" onclick="switchTab('siswa')" class="flex-1 py-2 text-xs font-bold text-center z-10 text-white transition-all duration-300 flex items-center justify-center gap-2">
+                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i>
+                        Siswa
+                    </button>
+                    <button type="button" id="btn-tab-gtk" onclick="switchTab('gtk')" class="flex-1 py-2 text-xs font-semibold text-center z-10 text-slate-400 transition-all duration-300 flex items-center justify-center gap-2">
+                        <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                        GTK / Staff
+                    </button>
+                </div>
+
+                <!-- NOTIFIKASI INFORMASI & ERROR -->
+                <div id="notification" class="hidden mb-4 p-2.5 rounded-xl text-xs flex flex-col gap-1.5 transition-all duration-350">
+                    <div class="flex items-start gap-2">
+                        <i id="notif-icon" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                        <span id="notif-message" class="leading-relaxed"></span>
+                    </div>
+                    <button id="btn-tutorial-cors" onclick="openTutorialModal()" class="hidden text-[10px] text-left text-red-200 underline font-semibold mt-0.5 hover:text-white flex items-center gap-1">
+                        <i data-lucide="help-circle" class="w-3 h-3"></i>
+                        Bagaimana cara memperbaiki kesalahan koneksi ini?
+                    </button>
+                </div>
+
+                <!-- FORM SISWA -->
+                <form id="form-siswa" onsubmit="handleLoginSiswa(event)" class="form-fade space-y-3.5">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">Pilih Kelas</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i data-lucide="layers" class="w-4 h-4"></i>
+                            </span>
+                            <select id="siswa-kelas" onchange="updateSiswaNames()" required class="w-full pl-9 pr-3 py-2 bg-white/10 border border-white/15 rounded-lg text-xs text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all [&_option]:bg-slate-900 [&_option]:text-white">
+                                <option value="">-- Pilih Kelas --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">Nama Lengkap Siswa</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i data-lucide="user" class="w-4 h-4"></i>
+                            </span>
+                            <select id="siswa-nama" required class="w-full pl-9 pr-3 py-2 bg-white/10 border border-white/15 rounded-lg text-xs text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all [&_option]:bg-slate-900 [&_option]:text-white">
+                                <option value="">-- Pilih Kelas Terlebih Dahulu --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">NIS (Nomor Induk Siswa)</label>
+                        <div class="relative flex items-center">
+                            <span class="absolute left-3 text-slate-400 z-10">
+                                <i data-lucide="key-round" class="w-4 h-4"></i>
+                            </span>
+                            <input type="password" id="siswa-nis" placeholder="Masukkan NIS Anda" required class="w-full pl-9 pr-10 py-2 bg-white/10 border border-white/15 rounded-lg text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all tracking-wider">
+                            <button type="button" onclick="togglePassword('siswa-nis', this)" class="absolute right-3 text-slate-400 hover:text-white transition-colors">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-green-800 hover:bg-green-700 text-white py-2.5 rounded-lg font-bold text-xs transition-all shadow-md flex items-center justify-center gap-1.5 mt-5">
+                        <span>Masuk Portal Akademik</span>
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                </form>
+
+                <!-- FORM GTK / STAFF (Hidden By Default) -->
+                <form id="form-gtk" onsubmit="handleLoginGtk(event)" class="form-fade space-y-3.5 hidden">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">Kategori Jabatan</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i data-lucide="briefcase" class="w-4 h-4"></i>
+                            </span>
+                            <select id="gtk-peran" onchange="updateGtkNames()" required class="w-full pl-9 pr-3 py-2 bg-white/10 border border-white/15 rounded-lg text-xs text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all [&_option]:bg-slate-900 [&_option]:text-white">
+                                <option value="">-- Pilih Jabatan --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">Nama Lengkap GTK</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i data-lucide="user" class="w-4 h-4"></i>
+                            </span>
+                            <select id="gtk-nama" required class="w-full pl-9 pr-3 py-2 bg-white/10 border border-white/15 rounded-lg text-xs text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all [&_option]:bg-slate-900 [&_option]:text-white">
+                                <option value="">-- Pilih Jabatan Terlebih Dahulu --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1">NIK (Nomor Induk Kependudukan)</label>
+                        <div class="relative flex items-center">
+                            <span class="absolute left-3 text-slate-400 z-10">
+                                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                            </span>
+                            <input type="password" id="gtk-nik" placeholder="Masukkan 16 digit NIK Anda" required class="w-full pl-9 pr-10 py-2 bg-white/10 border border-white/15 rounded-lg text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all tracking-wider">
+                            <button type="button" onclick="togglePassword('gtk-nik', this)" class="absolute right-3 text-slate-400 hover:text-white transition-colors">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-green-800 hover:bg-green-700 text-white py-2.5 rounded-lg font-bold text-xs transition-all shadow-md flex items-center justify-center gap-1.5 mt-5">
+                        <span>Verifikasi GTK</span>
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                </form>
+
+                <!-- Tombol Petunjuk Demo Database -->
+                <div class="mt-5 pt-3.5 border-t border-white/10 shrink-0">
+                    <button onclick="toggleDemoData()" class="w-full text-[11px] text-center text-slate-300 hover:text-green-400 transition-colors flex items-center justify-center gap-1">
+                        <i data-lucide="info" class="w-3 h-3"></i>
+                        Petunjuk Struktur & Akun Demo
+                    </button>
+                    
+                    <div id="demo-data-box" class="hidden mt-2 p-3 bg-slate-950/80 rounded-xl text-[11px] space-y-1.5 text-slate-300 border border-white/10">
+                        <p class="font-bold text-slate-200">📊 Struktur Kolom Sheet:</p>
+                        <p class="text-slate-300">• <strong class="text-green-400">regsiswa:</strong> Kolom <code class="bg-white/10 px-1 rounded">Nama Siswa</code>, <code class="bg-white/10 px-1 rounded">Kelas</code>, <code class="bg-white/10 px-1 rounded">NIS</code></p>
+                        <p class="text-slate-300">• <strong class="text-green-400">reggtk:</strong> Kolom <code class="bg-white/10 px-1 rounded">Nama GTK</code>, <code class="bg-white/10 px-1 rounded">Jabatan</code>, <code class="bg-white/10 px-1 rounded">NIK</code></p>
+                        <p class="font-bold text-slate-200 pt-1">🔑 Akun Demo (Offline):</p>
+                        <p class="text-slate-300">• Siswa: <strong class="text-amber-300">Urip Ambaripto</strong> (Kelas: 9-A, NIS: 009999)</p>
+                        <p class="text-slate-300">• GTK: <strong class="text-amber-300">Urip Ambaripto</strong> (Jabatan: Kepala Sekolah, NIK: 3527011212850009)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DASHBOARD (POST LOGIN - FULL SCREEN WINDOW) -->
+        <div id="dashboard" class="hidden bg-slate-900 w-full h-screen overflow-hidden transition-all duration-500 flex flex-col z-40">
+            <!-- Header Atas Dashboard -->
+            <div class="bg-gradient-to-r from-green-800 to-emerald-700 p-5 text-white flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-white/10 shrink-0">
+                <div>
+                    <span class="bg-white/20 text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Portal Layanan Akademik Terpadu</span>
+                    <h2 class="text-xl md:text-2xl font-extrabold mt-1">Selamat Datang, <span id="user-display-name" class="underline decoration-yellow-400 decoration-2">User</span>!</h2>
+                    <p class="text-[11px] text-emerald-100 mt-1 flex items-center gap-1 flex-wrap">
+                        <i data-lucide="fingerprint" class="w-3.5 h-3.5"></i>
+                        ID Unik: <span id="user-display-id" class="font-mono bg-green-950/40 px-1.5 py-0.5 rounded text-yellow-300">ID</span> 
+                        <span class="text-slate-300">|</span> 
+                        Status Akses: <span id="user-display-role" class="font-bold text-green-300">Role</span>
+                    </p>
+                </div>
+                <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 shadow-md shrink-0">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                    Keluar Sistem
+                </button>
+            </div>
+
+            <!-- Area Gulir Konten Layanan Internal -->
+            <div class="p-6 overflow-y-auto flex-grow space-y-6">
+                <!-- Status Papan Pengumuman Modern -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-slate-800">
+                    <div class="bg-emerald-50 border border-emerald-150 p-4 rounded-xl flex items-center gap-3">
+                        <div class="bg-emerald-600 text-white p-2.5 rounded-lg shrink-0">
+                            <i data-lucide="calendar" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Tahun Akademik</p>
+                            <p class="font-bold text-xs text-slate-800">Ganjil 2026/2027</p>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-150 p-4 rounded-xl flex items-center gap-3">
+                        <div class="bg-blue-600 text-white p-2.5 rounded-lg shrink-0">
+                            <i data-lucide="award" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Akreditasi Sekolah</p>
+                            <p class="font-bold text-xs text-slate-800">A (Sangat Memuaskan)</p>
+                        </div>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-150 p-4 rounded-xl flex items-center gap-3">
+                        <div class="bg-amber-600 text-white p-2.5 rounded-lg shrink-0">
+                            <i data-lucide="megaphone" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Pengumuman Sekolah</p>
+                            <p class="font-bold text-xs text-slate-800 truncate max-w-[200px]">Persiapan Penilaian Akhir Semester</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kisi-Kisi Menu Layanan Utama (Transparansi Sempurna) -->
+                <div>
+                    <h3 class="font-bold text-slate-200 mb-4 text-sm border-b border-white/10 pb-1.5 flex items-center gap-2">
+                        <i data-lucide="grid" class="w-4 h-4 text-green-400"></i>
+                        Kategori Layanan Utama Sekolah
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        <!-- Menu E-Rapor -->
+                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                            <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
+                                <i data-lucide="book-open" class="w-5 h-5"></i>
+                            </div>
+                            <h4 class="font-bold text-xs text-slate-100">E-Rapor Akademik</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Nilai & Nilai Ekstra</p>
+                        </div>
+
+                        <!-- Menu Jadwal -->
+                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                            <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
+                                <i data-lucide="clock" class="w-5 h-5"></i>
+                            </div>
+                            <h4 class="font-bold text-xs text-slate-100">Jadwal Kelas</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Waktu Belajar Mengajar</p>
+                        </div>
+
+                        <!-- Menu Presensi -->
+                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                            <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
+                                <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                            </div>
+                            <h4 class="font-bold text-xs text-slate-100">E-Presensi Harian</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Monitor Kehadiran Siswa</p>
+                        </div>
+
+                        <!-- Menu Perpustakaan -->
+                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                            <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
+                                <i data-lucide="library" class="w-5 h-5"></i>
+                            </div>
+                            <h4 class="font-bold text-xs text-slate-100">E-Perpustakaan</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">E-Book & Peminjaman Buku</p>
+                        </div>
+
+                        <!-- Menu Keuangan -->
+                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                            <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
+                                <i data-lucide="wallet" class="w-5 h-5"></i>
+                            </div>
+                            <h4 class="font-bold text-xs text-slate-100">Administrasi & SPP</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Detail Keuangan Mandiri</p>
+                        </div>
+
+                        <!-- Menu BK -->
+                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                            <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
+                                <i data-lucide="heart" class="w-5 h-5"></i>
+                            </div>
+                            <h4 class="font-bold text-xs text-slate-100">Layanan Konseling</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Hubungi Guru BK Terpercaya</p>
+                        </div>
+
+                        <!-- Menu Profil Sekolah -->
+                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                            <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
+                                <i data-lucide="info" class="w-5 h-5"></i>
+                            </div>
+                            <h4 class="font-bold text-xs text-slate-100">Profil SMP Diponegoro</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Visi, Misi, & Sejarah Singkat</p>
+                        </div>
+
+                        <!-- Menu Pengaturan Akun -->
+                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                            <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
+                                <i data-lucide="key" class="w-5 h-5"></i>
+                            </div>
+                            <h4 class="font-bold text-xs text-slate-100">Pengaturan Sandi</h4>
+                            <p class="text-[10px] text-slate-400 mt-0.5">Kelola Keamanan Kredensial</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER WITH SOCIAL MEDIA LINKS IN SINGLE HORIZONTAL BAR -->
+    <footer id="app-footer" class="bg-slate-950/95 backdrop-blur-md text-slate-400 py-2.5 px-6 text-[11px] border-t border-white/10 shrink-0 z-30">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-center items-center gap-3 md:gap-4 text-center">
+            
+            <!-- Sisi Kiri: Informasi Hak Cipta & Alamat Resmi Cilacap -->
+            <div class="flex flex-col md:flex-row items-center gap-1 md:gap-3">
+                <span class="font-semibold text-slate-300">SMP Diponegoro Sampang &copy; 2026</span>
+                <span class="hidden md:inline text-slate-700">|</span>
+                <span class="text-slate-500">Jl. Gerilya No. 70 Sampang, Kabupaten Cilacap, Jawa Tengah 53273</span>
+            </div>
+            
+            <span class="hidden md:inline text-slate-700">|</span>
+            
+            <!-- Sisi Kanan: Tautan Sosial Media (Gap Rapat, Putih Solid dengan Tooltip) -->
+            <div class="flex items-center gap-2.5">
+                <!-- Instagram Link -->
+                <div class="group relative">
+                    <a href="https://instagram.com/sekarmasdipo" target="_blank" rel="noopener noreferrer" 
+                       class="w-7 h-7 rounded-full bg-white/10 hover:bg-gradient-to-tr hover:from-amber-500 hover:via-pink-500 hover:to-violet-600 flex items-center justify-center text-white transition-all duration-300 hover:-translate-y-0.5 shadow-md"
+                       title="Instagram">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                        </svg>
+                    </a>
+                    <span class="absolute bottom-full right-1/2 translate-x-1/2 mb-1.5 px-2 py-0.5 text-[9px] font-bold text-white bg-slate-900 border border-white/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-xl z-30">
+                        Instagram: @sekarmasdipo
+                    </span>
+                </div>
+
+                <!-- Facebook Link -->
+                <div class="group relative">
+                    <a href="https://facebook.com/sekarmasdipo" target="_blank" rel="noopener noreferrer" 
+                       class="w-7 h-7 rounded-full bg-white/10 hover:bg-[#1877F2] flex items-center justify-center text-white transition-all duration-300 hover:-translate-y-0.5 shadow-md"
+                       title="Facebook">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </a>
+                    <span class="absolute bottom-full right-1/2 translate-x-1/2 mb-1.5 px-2 py-0.5 text-[9px] font-bold text-white bg-slate-900 border border-white/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-xl z-30">
+                        Facebook: sekarmasdipo
+                    </span>
+                </div>
+
+                <!-- YouTube Link -->
+                <div class="group relative">
+                    <a href="https://youtube.com/@sekarmasdipo" target="_blank" rel="noopener noreferrer" 
+                       class="w-7 h-7 rounded-full bg-white/10 hover:bg-[#FF0000] flex items-center justify-center text-white transition-all duration-300 hover:-translate-y-0.5 shadow-md"
+                       title="YouTube">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M23.498 6.163a3.003 3.003 0 00-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.517 0-9.388.507a3.003 3.003 0 00-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 002.11 2.11c1.871.507 9.388.507 9.388.507s7.517 0 9.388-.507a3.003 3.003 0 002.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                    </a>
+                    <span class="absolute bottom-full right-1/2 translate-x-1/2 mb-1.5 px-2 py-0.5 text-[9px] font-bold text-white bg-slate-900 border border-white/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-xl z-30">
+                        YouTube: sekarmasdipo
+                    </span>
+                </div>
+
+                <!-- Blog Resmi Link -->
+                <div class="group relative">
+                    <a href="https://smpdiponegorosampangcilacap.blogspot.com" target="_blank" rel="noopener noreferrer" 
+                       class="w-7 h-7 rounded-full bg-white/10 hover:bg-emerald-600 flex items-center justify-center text-white transition-all duration-300 hover:-translate-y-0.5 shadow-md"
+                       title="Blog Resmi">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-1.25 22.029C6.541 21.572 3.32 18.067 2.455 13.5h3.045c.421 1.77 1.096 3.407 1.986 4.868L6.22 19.634c-.451-.622-.843-1.306-1.163-2.034l-1.341.522c.381.87 1.141 1.58 2.054 2.054l.411-1.055-.411 1.055c.783.411 1.637.712 2.541.874l.43-1.125zM12 2c.86 0 1.69.1 2.5.29v2.17c-.8-.21-1.64-.34-2.5-.34s-1.7.13-2.5.34V2.29c.81-.19 1.64-.29 2.5-.29zm0 4.12c.81 0 1.61.12 2.38.35v11.06c-.77.23-1.57.35-2.38.35s-1.61-.12-2.38-.35V6.47c.77-.23 1.57-.35 2.38-.35zm-1.25 15.909l-.43-1.125c.34-.059.673-.139 1-.239v1.493c-.19.011-.38.016-.57.016-.19 0-.38-.005-.57-.016h.57zm2.5-.129v-1.493c.327.1.66.18 1 .239l-.43 1.125c-.19.011-.38.016-.57.016s-.38-.005-.57-.016h.57zm1.291-.141a10.023 10.023 0 002.541-.874l.411 1.055-.411-1.055c.913-.474 1.673-1.184 2.054-2.054l-1.341-.522c-.32.728-.712 1.412-1.163 2.034l-1.266-1.266c.89-1.461 1.565-3.098 1.986-4.868h3.045c-.865 4.567-4.086 8.072-8.295 8.529l.43-1.125zm7.414-9.529h-3.045c-.39-1.641-1.01-3.158-1.815-4.512L19.26 4.74c.983 1.082 1.728 2.391 2.181 3.844l1.32-.515c-.538-1.728-1.424-3.28-2.593-4.563L18.9 4.774A9.957 9.957 0 0012 2c-2.43 0-4.66.87-6.4 2.32L4.33 3.05a11.956 11.956 0 00-2.529 4.41l1.32.515c.453-1.453 1.198-2.762 2.181-3.844L6.57 5.399c-.805 1.354-1.425 2.871-1.815 4.512H1.71c.421-1.77 1.096-3.407 1.986-4.868L4.92 6.22c.451.622.843 1.306 1.163 2.034L7.424 7.732C7.043 6.862 6.283 6.152 5.37 5.678l-.411 1.055.411-1.055a10.023 10.023 0 012.541-.874L8.341 5.93c-.34.059-.673.139-1 .239V4.676c.19-.011.38-.016.57-.016s.38.005.57.016v1.493c.327-.1.66-.18 1-.239L9.05 4.805a9.922 9.922 0 012.95-.445c1.03 0 2.01.16 2.95.445l-.43 1.125c.327.059.66.139 1 .239V4.676c.19-.011.38-.016.57-.016s.38.005.57.016v1.493c.34-.1.673-.18 1-.239l.43-1.125a10.023 10.023 0 012.541.874l.411-1.055-.411 1.055c.913.474 1.673 1.184 2.054 2.054l1.266-.492c-.453-1.453-1.198-2.762-2.181-3.844l1.266-1.266a11.956 11.956 0 012.529 4.41l-1.32-.515zm-.104 2h3.045c-.865-4.567-4.086-8.072-8.295-8.529l-.43 1.125c.904-.162 1.758-.463 2.541-.874l-.411-1.055.411 1.055c.913.474 1.673 1.184 2.054 2.054l1.341.522c-.32-.728-.712-1.412-1.163-2.034l1.266 1.266c-.89 1.461-1.565 3.098-1.986 4.868H21.5c.39 1.641 1.01 3.158 1.815 4.512l-1.266 1.266c-.983-1.082-1.728-2.391-2.181-3.844l-1.32.515c.538 1.728 1.424 3.28 2.593 4.563l1.266-1.266A9.957 9.957 0 0112 22c2.43 0 4.66-.87 6.4-2.32l1.27 1.27a11.956 11.956 0 002.529-4.41l-1.32-.515c-.453 1.453-1.198 2.762-2.181 3.844l-1.266 1.266c.805-1.354 1.425-2.871 1.815-4.512z"/>
+                        </svg>
+                    </a>
+                    <span class="absolute bottom-full right-1/2 translate-x-1/2 mb-1.5 px-2 py-0.5 text-[9px] font-bold text-white bg-slate-900 border border-white/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-xl z-30">
+                        Blog: smpdiponegorosampangcilacap.blogspot.com
+                    </span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL 1: KONFIGURASI API SPREADSHEET -->
+    <div id="config-modal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden animate-in fade-in duration-200 text-slate-800">
+            <div class="bg-slate-900 text-white p-4 flex justify-between items-center border-b border-white/10">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="sliders" class="text-green-400 w-4.5 h-4.5"></i>
+                    <h3 class="font-extrabold text-sm">Konfigurasi API Google Sheets</h3>
+                </div>
+                <button onclick="closeConfigModal()" class="text-slate-400 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-3">
+                <p class="text-[11px] text-slate-500 leading-relaxed">
+                    Tempelkan URL Google Apps Script Web App (API) Anda untuk menghubungkan formulir login sekolah secara dinamis dengan database spreadsheet.
+                </p>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 mb-1">URL API DEPLOYMENT (Akhir: /exec)</label>
+                    <textarea id="input-api-url" rows="3" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all outline-none" placeholder="https://script.google.com/macros/s/.../exec"></textarea>
+                </div>
+                <div class="flex justify-between items-center pt-2">
+                    <button onclick="resetToDefaultApi()" class="text-xs text-red-500 hover:text-red-700 transition-colors font-bold flex items-center gap-1">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                        Kembalikan Default
+                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="closeConfigModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-colors">
+                            Batal
+                        </button>
+                        <button onclick="saveApiConfig()" class="px-4 py-2 bg-green-800 hover:bg-green-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm">
+                            Simpan & Sinkron
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: PANDUAN PENGATURAN GOOGLE APPS SCRIPT -->
+    <div id="tutorial-modal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden animate-in fade-in duration-200 text-slate-800">
+            <div class="bg-green-900 text-white p-4 flex justify-between items-center border-b border-white/10">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="help-circle" class="w-4.5 h-4.5"></i>
+                    <h3 class="font-bold text-sm">Panduan Sinkronisasi Database</h3>
+                </div>
+                <button onclick="closeTutorialModal()" class="text-green-100 hover:text-white transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-3 max-h-[60vh] overflow-y-auto text-xs leading-relaxed">
+                <p class="font-bold text-slate-800">Mengapa Sinkronisasi Terhambat?</p>
+                <p class="text-slate-600">
+                    Biasanya browser memblokir koneksi API (*CORS*) karena Apps Script dideploy secara privat atau meminta hak akses otentikasi akun Google Anda pribadi.
+                </p>
+                
+                <div class="border-l-4 border-amber-500 bg-amber-50 p-3 rounded-xl">
+                    <p class="font-bold text-amber-800 flex items-center gap-1 mb-1 text-[11px]">
+                        <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                        Solusi Singkat Deploy:
+                    </p>
+                    <ol class="list-decimal list-inside text-amber-950 space-y-1">
+                        <li>Buka Google Spreadsheet &gt; **Ekstensi** &gt; **Apps Script**.</li>
+                        <li>Klik **Terapkan (Deploy)** di kanan atas &gt; **Kelola Penerapan**.</li>
+                        <li>Klik ikon pensil edit pada versi Anda, ubah hak akses <strong class="text-red-700">"Who has access"</strong> ke <strong class="text-green-700">"Anyone" (Siapa Saja)</strong>.</li>
+                        <li>Deploy ulang, salin URL baru dan simpan di menu pengaturan gerigi web ini.</li>
+                    </ol>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button onclick="closeTutorialModal()" class="px-4 py-2 bg-green-800 hover:bg-green-700 text-white rounded-lg text-xs font-bold transition-all shadow-md">
+                        Mengerti, Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT & REAL-TIME SPREADSHEET INTEGRATION -->
+    <script>
+        const DEFAULT_API_URL = "https://script.google.com/macros/s/AKfycbzE4i_99hp9POOm_Q-at6zdjn_5c2UQTwvlnKdI3XD_mknqwzYdyWYqDNmMUMafWJPYRQ/exec";
+        let currentApiUrl = sessionStorage.getItem("SMP_API_URL") || DEFAULT_API_URL;
+
+        let masterData = {
+            reggtk: [],
+            regsiswa: []
+        };
+
+        let availableClasses = [];
+        let availableJabatans = [];
+        let activeTab = "siswa";
+
+        function switchTab(tab) {
+            activeTab = tab;
+            const indicator = document.getElementById('slider-indicator');
+            const btnSiswa = document.getElementById('btn-tab-siswa');
+            const btnGtk = document.getElementById('btn-tab-gtk');
+            const formSiswa = document.getElementById('form-siswa');
+            const formGtk = document.getElementById('form-gtk');
+            
+            hideNotification();
+
+            if (tab === 'siswa') {
+                indicator.style.transform = 'translateX(0)';
+                btnSiswa.className = "flex-1 py-2 text-xs font-bold text-center z-10 text-white transition-all duration-300 flex items-center justify-center gap-2";
+                btnGtk.className = "flex-1 py-2 text-xs font-semibold text-center z-10 text-slate-400 transition-all duration-300 flex items-center justify-center gap-2";
+                
+                // Animasi Form Switch
+                formGtk.style.opacity = '0';
+                formGtk.style.transform = 'translateY(8px)';
+                setTimeout(() => {
+                    formGtk.classList.add('hidden');
+                    formSiswa.classList.remove('hidden');
+                    setTimeout(() => {
+                        formSiswa.style.opacity = '1';
+                        formSiswa.style.transform = 'translateY(0)';
+                    }, 50);
+                }, 150);
+            } else {
+                indicator.style.transform = 'translateX(100%)';
+                btnGtk.className = "flex-1 py-2 text-xs font-bold text-center z-10 text-white transition-all duration-300 flex items-center justify-center gap-2";
+                btnSiswa.className = "flex-1 py-2 text-xs font-semibold text-center z-10 text-slate-400 transition-all duration-300 flex items-center justify-center gap-2";
+
+                // Animasi Form Switch
+                formSiswa.style.opacity = '0';
+                formSiswa.style.transform = 'translateY(8px)';
+                setTimeout(() => {
+                    formSiswa.classList.add('hidden');
+                    formGtk.classList.remove('hidden');
+                    setTimeout(() => {
+                        formGtk.style.opacity = '1';
+                        formGtk.style.transform = 'translateY(0)';
+                    }, 50);
+                }, 150);
+            }
+        }
+
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.setAttribute("data-lucide", "eye-off");
+            } else {
+                input.type = "password";
+                icon.setAttribute("data-lucide", "eye");
+            }
+            lucide.createIcons();
+        }
+
+        async function fetchSpreadsheetData() {
+            const statusDot = document.getElementById('status-dot');
+            const statusText = document.getElementById('status-text');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const tutorialBtn = document.getElementById('btn-tutorial-cors');
+
+            statusDot.className = "w-2 h-2 bg-amber-400 rounded-full animate-ping";
+            statusText.textContent = "Menghubungkan...";
+            loadingOverlay.classList.remove('hidden');
+            tutorialBtn.classList.add('hidden');
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+                const response = await fetch(currentApiUrl, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error("Gagal mengambil respon dari Google API.");
+                const result = await response.json();
+
+                if (result.status === "error") throw new Error(result.message);
+                
+                masterData.reggtk = result.reggtk || [];
+                masterData.regsiswa = result.regsiswa || [];
+
+                availableClasses = [...new Set(masterData.regsiswa.map(item => item.Kelas))].filter(Boolean).sort();
+                availableJabatans = [...new Set(masterData.reggtk.map(item => item.Jabatan))].filter(Boolean).sort();
+
+                populateInitialDropdowns();
+
+                statusDot.className = "w-2 h-2 bg-emerald-400 rounded-full";
+                statusText.textContent = "Database Sinkron";
+                loadingOverlay.classList.add('hidden');
+                hideNotification();
+            } catch (error) {
+                console.warn("Beralih ke mode offline.");
+                loadFallbackMockData();
+
+                statusDot.className = "w-2 h-2 bg-rose-500 rounded-full";
+                statusText.textContent = "Mode Offline Aktif";
+                
+                showNotification('error', 'Gagal memuat database online. Sistem otomatis menggunakan database cadangan.');
+                tutorialBtn.classList.remove('hidden');
+                loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        function populateInitialDropdowns() {
+            const kelasSelect = document.getElementById('siswa-kelas');
+            kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+            availableClasses.forEach(kelas => {
+                const opt = document.createElement('option');
+                opt.value = kelas;
+                opt.textContent = "Kelas " + kelas;
+                kelasSelect.appendChild(opt);
+            });
+
+            const peranSelect = document.getElementById('gtk-peran');
+            peranSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+            availableJabatans.forEach(jabatan => {
+                const opt = document.createElement('option');
+                opt.value = jabatan;
+                opt.textContent = jabatan;
+                peranSelect.appendChild(opt);
+            });
+        }
+
+        function updateSiswaNames() {
+            const kelasSelect = document.getElementById('siswa-kelas');
+            const namaSelect = document.getElementById('siswa-nama');
+            const selectedKelas = kelasSelect.value;
+
+            namaSelect.innerHTML = '<option value="">-- Pilih Nama Siswa --</option>';
+
+            if (selectedKelas) {
+                const filteredSiswa = masterData.regsiswa.filter(s => s.Kelas === selectedKelas);
+                filteredSiswa.forEach(siswa => {
+                    const opt = document.createElement('option');
+                    const nama = siswa["Nama Siswa"] || siswa.Nama;
+                    opt.value = nama;
+                    opt.textContent = nama;
+                    namaSelect.appendChild(opt);
+                });
+            } else {
+                namaSelect.innerHTML = '<option value="">-- Pilih Kelas Terlebih Dahulu --</option>';
+            }
+        }
+
+        function updateGtkNames() {
+            const peranSelect = document.getElementById('gtk-peran');
+            const namaSelect = document.getElementById('gtk-nama');
+            const selectedPeran = peranSelect.value;
+
+            namaSelect.innerHTML = '<option value="">-- Pilih Nama GTK --</option>';
+
+            if (selectedPeran) {
+                const filteredGtk = masterData.reggtk.filter(g => g.Jabatan === selectedPeran);
+                filteredGtk.forEach(gtk => {
+                    const opt = document.createElement('option');
+                    const nama = gtk["Nama GTK"] || gtk.Nama;
+                    opt.value = nama;
+                    opt.textContent = nama;
+                    namaSelect.appendChild(opt);
+                });
+            } else {
+                namaSelect.innerHTML = '<option value="">-- Pilih Jabatan Terlebih Dahulu --</option>';
+            }
+        }
+
+        function handleLoginSiswa(e) {
+            e.preventDefault();
+            const kelas = document.getElementById('siswa-kelas').value;
+            const nama = document.getElementById('siswa-nama').value;
+            const nisInput = document.getElementById('siswa-nis').value.trim();
+
+            if (!kelas || !nama || !nisInput) {
+                showNotification('error', 'Harap isi semua kolom formulir siswa.');
+                return;
+            }
+
+            const targetSiswa = masterData.regsiswa.find(s => 
+                s.Kelas === kelas && 
+                (s["Nama Siswa"] === nama || s.Nama === nama)
+            );
+
+            if (targetSiswa) {
+                const validNis = String(targetSiswa.NIS || targetSiswa.nis || targetSiswa.NISN || targetSiswa.nisn || "").trim();
+                
+                if (validNis === nisInput) {
+                    successLogin(nama, validNis, "Siswa Aktif (Kelas " + kelas + ")");
+                } else {
+                    showNotification('error', 'NIS tidak cocok dengan data terdaftar.');
+                }
+            } else {
+                showNotification('error', 'Siswa tidak terdaftar di kelas tersebut.');
+            }
+        }
+
+        function handleLoginGtk(e) {
+            e.preventDefault();
+            const jabatan = document.getElementById('gtk-peran').value;
+            const nama = document.getElementById('gtk-nama').value;
+            const nikInput = document.getElementById('gtk-nik').value.trim();
+
+            if (!jabatan || !nama || !nikInput) {
+                showNotification('error', 'Harap isi semua kolom GTK.');
+                return;
+            }
+
+            const targetGtk = masterData.reggtk.find(g => 
+                g.Jabatan === jabatan && 
+                (g["Nama GTK"] === nama || g.Nama === nama)
+            );
+
+            if (targetGtk) {
+                const validNik = String(targetGtk.NIK || targetGtk.nik || "").trim();
+                
+                if (validNik === nikInput) {
+                    successLogin(nama, validNik, "GTK (" + jabatan + ")");
+                } else {
+                    showNotification('error', 'NIK tidak sesuai untuk nama tersebut.');
+                }
+            } else {
+                showNotification('error', 'Data GTK tidak ditemukan.');
+            }
+        }
+
+        function successLogin(name, id, role) {
+            document.getElementById('user-display-name').textContent = name;
+            document.getElementById('user-display-id').textContent = id;
+            document.getElementById('user-display-role').textContent = role;
+
+            updateConfigButtonVisibility(name);
+
+            // Sembunyikan Header & Footer Utama
+            document.getElementById('app-header').classList.add('hidden');
+            document.getElementById('app-footer').classList.add('hidden');
+
+            document.getElementById('login-card').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+
+            // Set main container full screen
+            const mainContainer = document.getElementById('app-main');
+            mainContainer.classList.remove('p-4');
+            mainContainer.classList.add('p-0', 'w-full', 'h-screen');
+        }
+
+        function handleLogout() {
+            document.getElementById('form-siswa').reset();
+            document.getElementById('form-gtk').reset();
+            updateSiswaNames();
+            updateGtkNames();
+            hideNotification();
+
+            updateConfigButtonVisibility(null);
+
+            // Munculkan kembali Header & Footer Utama
+            document.getElementById('app-header').classList.remove('hidden');
+            document.getElementById('app-footer').classList.remove('hidden');
+
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('login-card').classList.remove('hidden');
+
+            const mainContainer = document.getElementById('app-main');
+            mainContainer.classList.add('p-4');
+            mainContainer.classList.remove('p-0', 'w-full', 'h-screen');
+        }
+
+        function isBuilderEnvironment() {
+            try {
+                const isIframe = window.self !== window.top;
+                const isSandbox = window.location.hostname === 'localhost' || 
+                                  window.location.hostname === '127.0.0.1' || 
+                                  window.location.origin === 'null' ||
+                                  window.location.href.includes('sandbox') ||
+                                  window.location.href.includes('webcontainer') ||
+                                  window.location.href.includes('stackblitz');
+                return isIframe || isSandbox;
+            } catch (e) {
+                return true; 
+            }
+        }
+
+        function updateConfigButtonVisibility(loggedInUser = null) {
+            const configBtn = document.getElementById('btn-config');
+            if (!configBtn) return;
+
+            const isBuilder = isBuilderEnvironment();
+            const isUrip = loggedInUser && loggedInUser.toLowerCase().trim() === 'urip ambaripto';
+
+            if (isBuilder || isUrip) {
+                configBtn.classList.remove('hidden');
+            } else {
+                configBtn.classList.add('hidden');
+            }
+        }
+
+        function toggleDemoData() {
+            const box = document.getElementById('demo-data-box');
+            box.classList.toggle('hidden');
+        }
+
+        function showNotification(type, message) {
+            const notif = document.getElementById('notification');
+            const icon = document.getElementById('notif-icon');
+            const msg = document.getElementById('notif-message');
+
+            notif.classList.remove('hidden', 'bg-red-950/60', 'text-red-200', 'border-red-700/50', 'bg-green-950/60', 'text-green-200', 'border-green-700/50');
+
+            if (type === 'error') {
+                notif.classList.add('bg-red-950/60', 'text-red-200', 'border', 'border-red-700/50');
+                icon.setAttribute('data-lucide', 'alert-circle');
+            } else {
+                notif.classList.add('bg-green-950/60', 'text-green-200', 'border', 'border-green-700/50');
+                icon.setAttribute('data-lucide', 'check-circle');
+            }
+
+            msg.textContent = message;
+            lucide.createIcons();
+        }
+
+        function hideNotification() {
+            document.getElementById('notification').classList.add('hidden');
+        }
+
+        function openConfigModal() {
+            document.getElementById('input-api-url').value = currentApiUrl;
+            document.getElementById('config-modal').classList.remove('hidden');
+        }
+
+        // MODAL TUTORIAL ACTIONS
+        function openTutorialModal() {
+            document.getElementById('tutorial-modal').classList.remove('hidden');
+        }
+
+        function closeTutorialModal() {
+            document.getElementById('tutorial-modal').classList.add('hidden');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('config-modal').classList.add('hidden');
+        }
+
+        function saveApiConfig() {
+            const newUrl = document.getElementById('input-api-url').value.trim();
+            if (newUrl) {
+                currentApiUrl = newUrl;
+                sessionStorage.setItem("SMP_API_URL", newUrl);
+                closeConfigModal();
+                fetchSpreadsheetData();
+            }
+        }
+
+        function resetToDefaultApi() {
+            document.getElementById('input-api-url').value = DEFAULT_API_URL;
+        }
+
+        function loadFallbackMockData() {
+            masterData.regsiswa = [
+                { "Nama Siswa": "Ahmad Fauzi", "Kelas": "9-A", "NIS": "009123" },
+                { "Nama Siswa": "Nadia Safitri", "Kelas": "9-A", "NIS": "009124" },
+                { "Nama Siswa": "Arif Budiman", "Kelas": "7-A", "NIS": "007111" },
+                { "Nama Siswa": "Bunga Lestari", "Kelas": "7-A", "NIS": "007112" },
+                { "Nama Siswa": "Urip Ambaripto", "Kelas": "9-A", "NIS": "009999" }
+            ];
+
+            masterData.reggtk = [
+                { "Nama GTK": "Drs. H. Mulyadi", "Jabatan": "Guru", "NIK": "3527011212750001" },
+                { "Nama GTK": "Siti Aminah, S.Pd.", "Jabatan": "Guru", "NIK": "3527014405820002" },
+                { "Nama GTK": "Hasan Basri", "Jabatan": "Tata Usaha", "NIK": "3527011503850005" },
+                { "Nama GTK": "Urip Ambaripto", "Jabatan": "Kepala Sekolah", "NIK": "3527011212850009" }
+            ];
+
+            availableClasses = [...new Set(masterData.regsiswa.map(item => item.Kelas))].sort();
+            availableJabatans = [...new Set(masterData.reggtk.map(item => item.Jabatan))].sort();
+
+            populateInitialDropdowns();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            updateConfigButtonVisibility(null);
+            fetchSpreadsheetData();
+        });
+    </script>
+</body>
+</html>
