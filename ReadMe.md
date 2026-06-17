@@ -10,7 +10,7 @@ Selamat datang di repositori resmi **SMP Diponegoro Sampang**. Repositori ini di
 SMP Diponegoro Sampang berkomitmen untuk mengintegrasikan nilai-nilai pendidikan karakter dengan pemanfaatan teknologi informasi guna mencetak generasi yang cerdas, kreatif, dan adaptif terhadap perkembangan zaman.
 
 * **Lokasi:** Sampang, Cilacap, Jawa Tengah, Indonesia
-* **Fokus Digital:** Pembelajaran Berbasis ICT, Pengembangan Portofolio Siswa, dan Bahan Ajar Digital.
+* **Fokus Digital:** Sistem Informasi Akademik.
 
 ---
 
