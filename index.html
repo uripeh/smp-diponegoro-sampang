@@ -290,13 +290,13 @@
                 <!-- Kisi-Kisi Menu Layanan Utama (Transparansi Sempurna) -->
                 <div>
                     <h3 class="font-bold text-slate-200 mb-4 text-sm border-b border-white/10 pb-1.5 flex items-center gap-2">
-                        <i data-lucide="grid" class="w-4 h-4 text-green-400"></i>
+                        <i data-lucide="grid" class="text-green-400 w-4 h-4"></i>
                         Kategori Layanan Utama Sekolah
                     </h3>
                     
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                         <!-- Menu E-Rapor -->
-                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                        <div onclick="showDevNotice('E-Rapor Akademik')" class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
                             <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
                                 <i data-lucide="book-open" class="w-5 h-5"></i>
                             </div>
@@ -305,7 +305,7 @@
                         </div>
 
                         <!-- Menu Jadwal -->
-                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                        <div onclick="showDevNotice('Jadwal Kelas')" class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
                             <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
                                 <i data-lucide="clock" class="w-5 h-5"></i>
                             </div>
@@ -314,7 +314,7 @@
                         </div>
 
                         <!-- Menu Presensi -->
-                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                        <div onclick="showDevNotice('E-Presensi Harian')" class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
                             <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
                                 <i data-lucide="calendar-check" class="w-5 h-5"></i>
                             </div>
@@ -323,7 +323,7 @@
                         </div>
 
                         <!-- Menu Perpustakaan -->
-                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                        <div onclick="showDevNotice('E-Perpustakaan')" class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
                             <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
                                 <i data-lucide="library" class="w-5 h-5"></i>
                             </div>
@@ -332,7 +332,7 @@
                         </div>
 
                         <!-- Menu Keuangan -->
-                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                        <div onclick="showDevNotice('Administrasi & SPP')" class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
                             <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
                                 <i data-lucide="wallet" class="w-5 h-5"></i>
                             </div>
@@ -341,7 +341,7 @@
                         </div>
 
                         <!-- Menu BK -->
-                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                        <div onclick="showDevNotice('Layanan Konseling')" class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
                             <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
                                 <i data-lucide="heart" class="w-5 h-5"></i>
                             </div>
@@ -350,7 +350,7 @@
                         </div>
 
                         <!-- Menu Profil Sekolah -->
-                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                        <div onclick="showDevNotice('Profil SMP Diponegoro')" class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
                             <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
                                 <i data-lucide="info" class="w-5 h-5"></i>
                             </div>
@@ -359,7 +359,7 @@
                         </div>
 
                         <!-- Menu Pengaturan Akun -->
-                        <div class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
+                        <div onclick="showDevNotice('Pengaturan Sandi')" class="group border border-white/10 hover:border-green-500 hover:bg-green-950/40 p-4 rounded-xl text-center transition-all cursor-pointer shadow-sm bg-slate-900/40 backdrop-blur-md">
                             <div class="mx-auto w-10 h-10 bg-green-950/80 text-green-400 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform">
                                 <i data-lucide="key" class="w-5 h-5"></i>
                             </div>
@@ -372,6 +372,9 @@
         </div>
 
     </main>
+
+    <!-- CONTAINER FLOATING TOAST NOTIFICATION -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[100] flex flex-col gap-3 pointer-events-none max-w-sm w-full px-4 sm:px-0"></div>
 
     <!-- FOOTER WITH SOCIAL MEDIA LINKS IN SINGLE HORIZONTAL BAR -->
     <footer id="app-footer" class="bg-slate-950/95 backdrop-blur-md text-slate-400 py-2.5 px-6 text-[11px] border-t border-white/10 shrink-0 z-30">
@@ -586,14 +589,21 @@
 
         function togglePassword(inputId, button) {
             const input = document.getElementById(inputId);
-            const icon = button.querySelector('i');
-            if (input.type === "password") {
-                input.type = "text";
-                icon.setAttribute("data-lucide", "eye-off");
-            } else {
-                input.type = "password";
-                icon.setAttribute("data-lucide", "eye");
-            }
+            if (!input) return;
+            
+            // Cek kondisi tipe input saat ini
+            const isPassword = input.type === "password";
+            
+            // Toggle tipe input
+            input.type = isPassword ? "text" : "password";
+            
+            // Tentukan nama ikon baru
+            const newIconName = isPassword ? "eye-off" : "eye";
+            
+            // Konstruksi ulang elemen i agar terbebas dari siklus perubahan SVG Lucide
+            button.innerHTML = `<i data-lucide="${newIconName}" class="w-4 h-4"></i>`;
+            
+            // Render ulang ikon menggunakan pustaka Lucide
             lucide.createIcons();
         }
 
@@ -861,6 +871,52 @@
 
         function hideNotification() {
             document.getElementById('notification').classList.add('hidden');
+        }
+
+        function showToast(message, type = 'warning') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = "pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-xl border shadow-2xl transition-all duration-300 transform translate-y-4 opacity-0 glass-card bg-slate-950/90 border-amber-500/30 text-amber-100 max-w-sm w-full backdrop-blur-md";
+
+            let iconName = 'alert-triangle';
+            if (type === 'success') {
+                toast.className = "pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-xl border shadow-2xl transition-all duration-300 transform translate-y-4 opacity-0 glass-card bg-slate-950/90 border-green-500/30 text-green-100 max-w-sm w-full backdrop-blur-md";
+                iconName = 'check-circle';
+            }
+
+            toast.innerHTML = `
+                <div class="p-1 rounded-lg ${type === 'success' ? 'bg-green-500/10 text-green-400' : 'bg-amber-500/10 text-amber-400'} shrink-0">
+                    <i data-lucide="${iconName}" class="w-4.5 h-4.5"></i>
+                </div>
+                <div class="flex-grow">
+                    <p class="text-xs font-semibold leading-relaxed">${message}</p>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white transition-colors ml-auto pl-2 shrink-0">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            // Animasi masuk halus
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 10);
+
+            // Hilang otomatis dalam 4,5 detik
+            setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 4500);
+        }
+
+        function showDevNotice(menuName) {
+            showToast(`Mohon maaf, layanan "${menuName}" saat ini masih dalam tahap pengembangan.`, 'warning');
         }
 
         function openConfigModal() {
