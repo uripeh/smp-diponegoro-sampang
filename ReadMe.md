@@ -15,7 +15,6 @@ SMP Diponegoro Sampang berkomitmen untuk mengintegrasikan nilai-nilai pendidikan
 ---
 
 ## 📂 Struktur Repositori
-## 📂 Struktur Repositori
 Berikut adalah peta folder (direktori) yang digunakan untuk mengelola sistem informasi dan administrasi digital di SMP Diponegoro Sampang:
 
 ```text
